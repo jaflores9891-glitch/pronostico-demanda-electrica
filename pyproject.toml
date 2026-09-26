@@ -1,0 +1,17 @@
+[project]
+name = "pronostico-demanda-electrica"
+version = "0.1.0"
+description = "Pronóstico mensual de demanda eléctrica por región de México con datos de CENACE"
+readme = "README.md"
+authors = [
+    { name = "Jesus-Flores", email = "jaflores9891@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = []
+
+[project.scripts]
+pronostico-demanda-electrica = "pronostico_demanda_electrica:main"
+
+[build-system]
+requires = ["uv_build>=0.12.19,<0.13.0"]
+build-backend = "uv_build"
