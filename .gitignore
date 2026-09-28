@@ -21,3 +21,6 @@ __pycache__/
 # Archivos del sistema operativo
 .DS_Store
 Thumbs.db
+
+# Archivo de tests rapidos
+pruebas_borrador.py

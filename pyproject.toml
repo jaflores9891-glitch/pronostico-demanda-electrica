@@ -7,7 +7,9 @@ authors = [
     { name = "Jesus-Flores", email = "jaflores9891@gmail.com" }
 ]
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "pandas>=3.0.6",
+]
 
 [project.scripts]
 pronostico-demanda-electrica = "pronostico_demanda_electrica:main"
