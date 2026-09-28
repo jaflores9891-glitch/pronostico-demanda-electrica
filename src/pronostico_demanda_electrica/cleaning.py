@@ -25,3 +25,11 @@ def leer_csv_cenace(ruta: Path) -> pd.DataFrame:
 def normalizar_columnas(df: pd.DataFrame) -> pd.DataFrame:
     """Quita espacios de los nombres y los renombra al vocabulario del proyecto."""
     return df.rename(columns=str.strip).rename(columns=COLUMNAS)
+
+
+COLUMNAS_FINALES = ["sistema", "area", "hora", "demanda_mwh"]
+
+
+def seleccionar_columnas(df: pd.DataFrame) -> pd.DataFrame:
+    """Conserva solo las columnas que usa el proyecto."""
+    return df[COLUMNAS_FINALES]
