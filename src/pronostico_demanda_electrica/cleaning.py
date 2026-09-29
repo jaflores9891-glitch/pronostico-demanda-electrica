@@ -2,6 +2,9 @@ from pathlib import Path
 
 import pandas as pd
 
+import re
+from datetime import date, datetime
+
 LINEAS_ENCABEZADO = 8
 
 COLUMNAS = {
@@ -33,3 +36,21 @@ COLUMNAS_FINALES = ["sistema", "area", "hora", "demanda_mwh"]
 def seleccionar_columnas(df: pd.DataFrame) -> pd.DataFrame:
     """Conserva solo las columnas que usa el proyecto."""
     return df[COLUMNAS_FINALES]
+
+LINEA_LIQUIDACION = 7
+PATRON_ENCABEZADO = r"LIQUIDACION (\d+) \(Dia de Operacion: (\d{2}/\d{2}/\d{4})\)"
+FORMATO_FECHA = "%d/%m/%Y"
+
+def leer_encabezado(ruta: Path) -> tuple[int, date]:
+    "Devuelve la liquidacion y el dia de operacion de un CSV de CENACE."
+    with open(ruta) as f:
+        linea = f.readlines()[LINEA_LIQUIDACION]
+
+    coincidencia = re.search(PATRON_ENCABEZADO, linea)
+    if coincidencia is None:
+        raise ValueError(f"Encabezado inesperado en {ruta}: {linea!r}")
+    liquidacion = coincidencia.group(1)
+    fecha = coincidencia.group(2)
+    return int(liquidacion), datetime.strptime(fecha, FORMATO_FECHA).date()
+
+
