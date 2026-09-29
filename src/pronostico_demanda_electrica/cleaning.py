@@ -29,7 +29,7 @@ def normalizar_columnas(df: pd.DataFrame) -> pd.DataFrame:
     return df.rename(columns=str.strip).rename(columns=COLUMNAS)
 
 
-COLUMNAS_FINALES = ["sistema", "area", "hora", "demanda_mwh"]
+COLUMNAS_FINALES = ["fecha", "sistema", "area", "hora", "demanda_mwh"]
 
 
 def seleccionar_columnas(df: pd.DataFrame) -> pd.DataFrame:
@@ -55,3 +55,17 @@ def leer_encabezado(ruta: Path) -> tuple[int, date]:
     # CENACE reporta un día de calendario: no se usa hora ni zona horaria.
     fecha = datetime.strptime(texto_fecha, FORMATO_FECHA).date()  # noqa: DTZ007
     return liquidacion, fecha
+
+
+LIQUIDACION_ESPERADA = 0
+
+
+def procesar_archivo(ruta: Path) -> pd.DataFrame:
+    """Convierte un CSV crudo de CENACE en la tabla limpia del proyecto."""
+    liquidacion, fecha = leer_encabezado(ruta)
+    if liquidacion != LIQUIDACION_ESPERADA:
+        raise ValueError(f"La liquidación es inválida en {ruta}: {liquidacion}")
+    df = leer_csv_cenace(ruta)
+    df = normalizar_columnas(df)
+    df = df.assign(fecha=fecha)
+    return seleccionar_columnas(df)
