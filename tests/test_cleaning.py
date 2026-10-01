@@ -6,6 +6,7 @@ import pytest
 from pronostico_demanda_electrica.cleaning import (
     leer_encabezado,
     normalizar_columnas,
+    procesar_archivo,
 )
 
 
@@ -55,3 +56,13 @@ def test_leer_encabezado_rechaza_formato_de_fecha_invalido(tmp_path):
     # Actuar y verificar
     with pytest.raises(ValueError, match="Encabezado inesperado"):
         leer_encabezado(ruta)
+
+
+def test_procesar_archivo_rechaza_liquidacion_invalida(tmp_path):
+    # Preparar
+    ruta = _crear_csv_con_encabezado(
+        tmp_path, "LIQUIDACION 4 (Dia de Operacion: 11/09/2026)\n"
+    )
+    # Actuar y verificar
+    with pytest.raises(ValueError, match="La liquidación es inválida"):
+        procesar_archivo(ruta)
