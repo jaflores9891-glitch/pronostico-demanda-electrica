@@ -1,6 +1,11 @@
+from datetime import date
+
 import pandas as pd
 
-from pronostico_demanda_electrica.cleaning import normalizar_columnas
+from pronostico_demanda_electrica.cleaning import (
+    leer_encabezado,
+    normalizar_columnas,
+)
 
 
 def test_normalizar_columnas_renombra_sin_modificar_el_original():
@@ -24,15 +29,21 @@ def test_normalizar_columnas_renombra_sin_modificar_el_original():
     ], "Se modifico el df original"
 
 
-def test_normalizar_columnas_no_modifica_el_original():
-    df = pd.DataFrame(
-        columns=[" Area", " Hora", " Estimacion de Demanda por Balance (MWh) "]
+def test_leer_encabezado(tmp_path):
+    # Preparar
+    ruta = tmp_path / "mi_archivo.csv"
+
+    ruta.write_text(
+        "linea1\n"
+        "linea2\n"
+        "linea3\n"
+        "linea4\n"
+        "linea5\n"
+        "linea6\n"
+        "linea7\n"
+        "LIQUIDACION 0 (Dia de Operacion: 11/09/2026)"
     )
-
-    normalizar_columnas(df)
-
-    assert list(df.columns) == [
-        " Area",
-        " Hora",
-        " Estimacion de Demanda por Balance (MWh) ",
-    ]
+    # Actuar
+    encabezado = leer_encabezado(ruta)
+    # Verificar
+    assert encabezado == (0, date(2026, 9, 11))
