@@ -4,15 +4,16 @@ import pandas as pd
 import pytest
 
 from pronostico_demanda_electrica.cleaning import (
+    COLUMNAS_FINALES,
     leer_encabezado,
     normalizar_columnas,
     procesar_archivo,
 )
 
 
-def _crear_csv_con_encabezado(tmp_path, linea_encabezado):
+def _crear_csv_con_encabezado(tmp_path, linea_encabezado, tabla=""):
     ruta = tmp_path / "mi_archivo.csv"
-    ruta.write_text("relleno\n" * 7 + linea_encabezado)
+    ruta.write_text("relleno\n" * 7 + linea_encabezado + tabla)
     return ruta
 
 
@@ -66,3 +67,22 @@ def test_procesar_archivo_rechaza_liquidacion_invalida(tmp_path):
     # Actuar y verificar
     with pytest.raises(ValueError, match="La liquidación es inválida"):
         procesar_archivo(ruta)
+
+
+def test_procesar_archivo_devuelve_tabla_limpia(tmp_path):
+    # Preparar
+    encabezado = "LIQUIDACION 0 (Dia de Operacion: 11/09/2026)\n"
+
+    tabla = (
+        " Sistema, Area, Hora, Generacion (MWh), Importacion Total (MWh), Exportacion Total (MWh), Intercambio neto entre Gerencias (MWh), Estimacion de Demanda por Balance (MWh) \n"
+        " BCA, BCA, 1, 100, 20, 10, ---, 110\n"
+    )
+
+    ruta = _crear_csv_con_encabezado(tmp_path, encabezado, tabla)
+
+    # Actuar
+    resultado = procesar_archivo(ruta)
+
+    # Verificar
+    assert list(resultado.columns) == COLUMNAS_FINALES
+    assert resultado["fecha"].iloc[0] == date(2026, 9, 11)
