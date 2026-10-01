@@ -9,6 +9,12 @@ from pronostico_demanda_electrica.cleaning import (
 )
 
 
+def _crear_csv_con_encabezado(tmp_path, linea_encabezado):
+    ruta = tmp_path / "mi_archivo.csv"
+    ruta.write_text("relleno\n" * 7 + linea_encabezado)
+    return ruta
+
+
 def test_normalizar_columnas_renombra_sin_modificar_el_original():
     # Preparar: nombres como vienen de CENACE, con espacios
     df = pd.DataFrame(
@@ -32,17 +38,8 @@ def test_normalizar_columnas_renombra_sin_modificar_el_original():
 
 def test_leer_encabezado_devuelve_liquidacion_y_fecha(tmp_path):
     # Preparar
-    ruta = tmp_path / "mi_archivo.csv"
-
-    ruta.write_text(
-        "linea1\n"
-        "linea2\n"
-        "linea3\n"
-        "linea4\n"
-        "linea5\n"
-        "linea6\n"
-        "linea7\n"
-        "LIQUIDACION 0 (Dia de Operacion: 11/09/2026)"
+    ruta = _crear_csv_con_encabezado(
+        tmp_path, "LIQUIDACION 0 (Dia de Operacion: 11/09/2026)\n"
     )
     # Actuar
     encabezado = leer_encabezado(ruta)
@@ -52,16 +49,8 @@ def test_leer_encabezado_devuelve_liquidacion_y_fecha(tmp_path):
 
 def test_leer_encabezado_rechaza_formato_de_fecha_invalido(tmp_path):
     # Preparar
-    ruta = tmp_path / "mi_archivo.csv"
-    ruta.write_text(
-        "línea 1\n"
-        "línea 2\n"
-        "línea 3\n"
-        "línea 4\n"
-        "línea 5\n"
-        "línea 6\n"
-        "línea 7\n"
-        "LIQUIDACION 0 (Dia de Operacion: 2026-09-11)\n"
+    ruta = _crear_csv_con_encabezado(
+        tmp_path, "LIQUIDACION 0 (Dia de Operacion: 2026-09-11)\n"
     )
     # Actuar y verificar
     with pytest.raises(ValueError, match="Encabezado inesperado"):
