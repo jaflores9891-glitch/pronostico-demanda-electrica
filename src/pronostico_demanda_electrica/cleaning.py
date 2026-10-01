@@ -46,7 +46,6 @@ def leer_encabezado(ruta: Path) -> tuple[int, date]:
     "Devuelve la liquidacion y el dia de operacion de un CSV de CENACE."
     with open(ruta) as f:
         linea = f.readlines()[LINEA_LIQUIDACION]
-
     coincidencia = re.search(PATRON_ENCABEZADO, linea)
     if coincidencia is None:
         raise ValueError(f"Encabezado inesperado en {ruta}: {linea!r}")
