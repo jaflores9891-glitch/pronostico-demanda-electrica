@@ -1,6 +1,7 @@
 from datetime import date
 
 import pandas as pd
+import pytest
 
 from pronostico_demanda_electrica.cleaning import (
     leer_encabezado,
@@ -29,7 +30,7 @@ def test_normalizar_columnas_renombra_sin_modificar_el_original():
     ], "Se modifico el df original"
 
 
-def test_leer_encabezado(tmp_path):
+def test_leer_encabezado_devuelve_liquidacion_y_fecha(tmp_path):
     # Preparar
     ruta = tmp_path / "mi_archivo.csv"
 
@@ -47,3 +48,21 @@ def test_leer_encabezado(tmp_path):
     encabezado = leer_encabezado(ruta)
     # Verificar
     assert encabezado == (0, date(2026, 9, 11))
+
+
+def test_leer_encabezado_rechaza_formato_de_fecha_invalido(tmp_path):
+    # Preparar
+    ruta = tmp_path / "mi_archivo.csv"
+    ruta.write_text(
+        "línea 1\n"
+        "línea 2\n"
+        "línea 3\n"
+        "línea 4\n"
+        "línea 5\n"
+        "línea 6\n"
+        "línea 7\n"
+        "LIQUIDACION 0 (Dia de Operacion: 2026-09-11)\n"
+    )
+    # Actuar y verificar
+    with pytest.raises(ValueError, match="Encabezado inesperado"):
+        leer_encabezado(ruta)
