@@ -7,6 +7,7 @@ import pandas as pd
 LINEAS_ENCABEZADO = 8
 
 COLUMNAS = {
+    # Formato habitual de CENACE
     "Sistema": "sistema",
     "Area": "area",
     "Hora": "hora",
@@ -15,6 +16,15 @@ COLUMNAS = {
     "Exportacion Total (MWh)": "exportacion_mwh",
     "Intercambio neto entre Gerencias (MWh)": "intercambio_mwh",
     "Estimacion de Demanda por Balance (MWh)": "demanda_mwh",
+    # Formato alternativo (18 archivos de agosto de 2022)
+    "CLV_SISTEMA": "sistema",
+    "CLV_AREA": "area",
+    "HORA": "hora",
+    "GENERACION": "generacion_mwh",
+    "IMPORTACION": "importacion_mwh",
+    "EXPORTACION": "exportacion_mwh",
+    "ENERGIA ENTRE GERENCIAS": "intercambio_mwh",
+    "BALANCE": "demanda_mwh",
 }
 
 
