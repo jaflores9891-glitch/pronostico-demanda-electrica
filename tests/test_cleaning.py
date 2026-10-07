@@ -86,3 +86,21 @@ def test_procesar_archivo_devuelve_tabla_limpia(tmp_path):
     # Verificar
     assert list(resultado.columns) == COLUMNAS_FINALES
     assert resultado["fecha"].iloc[0] == date(2026, 9, 11)
+
+
+def test_procesar_archivo_acepta_formato_alternativo(tmp_path):
+    # Preparar
+    encabezado = "LIQUIDACION 0 (Dia de Operacion: 11/09/2026)\n"
+    tabla = (
+        "CLV_SISTEMA,CLV_AREA,HORA,GENERACION,IMPORTACION,EXPORTACION,"
+        "ENERGIA ENTRE GERENCIAS,BALANCE\n"
+        "BCA,BCA,1,100,20,10,---,110\n"
+    )
+    ruta = _crear_csv_con_encabezado(tmp_path, encabezado, tabla)
+
+    # Actuar
+    resultado = procesar_archivo(ruta)
+
+    # Verificar
+    assert list(resultado.columns) == COLUMNAS_FINALES
+    assert resultado["demanda_mwh"].iloc[0] == 110
