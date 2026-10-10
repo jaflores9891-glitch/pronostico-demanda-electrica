@@ -18,7 +18,9 @@ def naive_estacional(entrenamiento: pd.DataFrame, prueba: pd.DataFrame) -> pd.Se
         gwh_dia=entrenamiento["demanda_gwh"] / entrenamiento["dias"],
         mes=entrenamiento["mes"] + pd.DateOffset(years=1),
     )[["region", "mes", "gwh_dia"]]
-    unido = prueba.merge(anio_anterior, on=["region", "mes"], how="left")
+    unido = prueba[["region", "mes", "dias"]].merge(
+        anio_anterior, on=["region", "mes"], how="left"
+    )
     return pd.Series((unido["gwh_dia"] * unido["dias"]).to_numpy(), index=prueba.index)
 
 
