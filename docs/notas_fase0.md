@@ -66,12 +66,30 @@ el dato más reciente está menos sujeto a cambios por re-liquidaciones.
 
 CENACE publica varias versiones del mismo día: la liquidación 0 (inicial) y
 re-liquidaciones posteriores. Los días de 2022 tienen hasta la liquidación 4;
-los días recientes solo tienen la 0. La página las ordena de la más reciente a la más antigua.
+los días recientes solo tienen la 0. La página las lista de la liquidación 0 a la 4,
+de la más antigua a la más reciente.
 
-- **Diferencia medida entre liquidación 0 y 4:** ≈ 0.5% en promedio.
-- **Método:** [COMPLETAR: qué día, qué área y qué horas comparaste, y cómo calculaste el 0.5%]
+- La liquidación 0 se publica ~14 días después del día de operación.
+- La liquidación 4 llega ~616 días después.
+- **Diferencia medida entre liquidación 0 y 4:** 0.27% hora por hora; 0.0% en el total anual.
+- **Método:** comparé ambas liquidaciones en todo 2022 (78,840 registros: mismo día, sistema,
+  área y hora). Diferencia hora por hora = Σ|L4 − L0| / Σ L0; diferencia total = Σ L4 / Σ L0 − 1.
+  Las correcciones se compensan al sumar, así que el total mensual casi no cambia.
 
 **Decisión:** usar siempre la **liquidación 0**.
 
 **Argumento:** cuando el modelo pronostique en la vida real, los meses más recientes
 solo existirán como liquidación 0.
+
+---
+
+## 5. Resultado de la revisión
+
+| Criterio | Resultado con CENACE |
+|---|---|
+| ≥ 36 meses continuos | ✅ 56 meses (ene-2022 a ago-2026) |
+| < 10% de meses faltantes | ✅ 0%: los 1,704 días completos en las 9 regiones |
+| Formato consistente | ✅ con mapeo: 18 archivos de ago-2022 con nombres alternativos de columnas (ver Fase 2) |
+| Sin pandemia | ✅ los datos empiezan en 2022 |
+
+**Decisión:** CENACE cumple los cuatro criterios. Se usa de enero de 2022 a agosto de 2026.

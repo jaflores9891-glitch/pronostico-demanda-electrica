@@ -44,9 +44,9 @@
 
 ### Reproducibilidad: se sube la receta, no el platillo
 - **Se suben:** `pyproject.toml` (rangos compatibles), `uv.lock` (versiones exactas), `.python-version` (Python exacto).
-- **No se suben:** `.venv/` (compilado para mi sistema) ni `data/raw/` (se regenera con el script).
+- **No se suben:** `.venv/` (compilado para mi sistema) ni `data/raw/` (se regenera descargando los .zip de CENACE y corriendo el pipeline).
 - `requires-python = ">=3.12"` es un **rango**; `.python-version` **fija** la versión.
-- Streamlit Cloud **no** lee `.python-version`: la versión se elige al desplegar (pendiente de la Fase 7).
+- Streamlit Cloud **no** lee `.python-version`: la versión se elige al desplegar (en la Fase 7 se configuró 3.12).
 - Dependencias de **producción** en `dependencies`; de **desarrollo** (Ruff, pytest) en `[dependency-groups] dev`.
 
 ### `.gitignore`
@@ -76,7 +76,7 @@
 - **Postgres 18 = misma versión mayor que Neon**, para evitar diferencias entre local y producción.
 - **`postgres:18` y no `latest`:** Postgres no puede leer datos guardados por otra versión mayor; con `latest`, una actualización dejaría el contenedor sin arrancar.
 - **Volumen `postgres_data` en `/var/lib/postgresql`** (ruta correcta para Postgres 18). Comprobé la persistencia: creé una tabla, hice `docker compose down`, levanté de nuevo y el dato seguía ahí.
-- **Nunca `docker compose down -v`**: borra los volúmenes y todos los datos.
+- **`docker compose down -v` borra los volúmenes y todos los datos.** Solo se usa a propósito: por ejemplo, para cambiar la contraseña, que Postgres solo toma al crear la base por primera vez (así se hizo en la Fase 7, con la base aún vacía).
 - **Puerto 5433:** el 5432 de mi WSL ya estaba ocupado.
 - **Mapeo de puertos `"${POSTGRES_PORT}:5432"`:** afuera, el puerto de mi computadora; adentro, Postgres siempre escucha en 5432. El contenedor está aislado, así que el conflicto solo existe afuera.
 - **Credenciales en `.env`**, leídas por Compose con `${...}`. El puerto también, para tener una sola fuente de verdad.
@@ -94,7 +94,7 @@
 - Pasos: `uv sync --locked` → `ruff check` → `ruff format --check` → `pytest`.
 - **`--locked`:** falla si `uv.lock` no coincide con `pyproject.toml`, para que el CI pruebe exactamente lo mismo que uso yo.
 - **Las acciones de GitHub también se fijan.** `setup-uv` no publica etiquetas cortas como `v9`.
-  Opción elegida: uses: astral-sh/setup-uv@bec219d24cd3e171d82865faccec33120bb574f4 # v10.1.0
+  Opción elegida: `uses: astral-sh/setup-uv@bec219d24cd3e171d82865faccec33120bb574f4 # v10.1.0`
 
 ---
 
@@ -135,9 +135,9 @@ git log --oneline            # si HEAD y origin/main difieren, falta un push
 
 ## 6. Pendientes
 
-- [ ] Llenar los 3 `[COMPLETAR]` de `notas_fase0.md`
-- [ ] Decidir si se agrega licencia (MIT)
-- [ ] Fase 7: elegir Python 3.12 en la configuración de Streamlit Cloud
+- [x] Llenar el `[COMPLETAR]` de `notas_fase0.md` (diferencia entre liquidaciones medida en todo 2022)
+- [x] Licencia: se decidió no agregarla (proyecto de portafolio; no se espera reutilización)
+- [x] Fase 7: Python 3.12 configurado en Streamlit Cloud
 
 ---
 
@@ -156,7 +156,10 @@ proyecto funciona y que el paquete puede importarse. También comprobé que fall
 debe fallar.
 
 **¿Por qué usas Docker solo para Postgres?**
-Ver la sección 3.
+Porque es la única pieza que necesita un servicio corriendo. Streamlit Cloud no acepta
+contenedores y el CI usa uv directamente, así que meter la app en Docker agregaría
+complejidad sin aportar nada.
 
 **¿Por qué `uv sync --locked` en el CI?**
-Ver la sección 3.
+Porque falla si `uv.lock` no coincide con `pyproject.toml`. Así el CI prueba exactamente
+las mismas versiones que uso yo, y no unas distintas que se resolvieron ese día.
